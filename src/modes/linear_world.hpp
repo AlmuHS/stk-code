@@ -62,8 +62,8 @@ private:
     class KartInfo
     {
     public:
-        /** Number of finished(!) laps. */
-        int         m_race_lap;
+        /** Number of finished laps. */
+        int         m_finished_laps;
 
         /** Time at finishing last lap. */
         int         m_ticks_at_last_lap;
@@ -78,17 +78,22 @@ private:
          *  track-length plus distance-along-track). */
         float       m_overall_distance;
 
+        /** Accumulates the time a kart has been driving in the wrong
+         *  direction so that a message can be displayed. */
+        float       m_wrong_way_timer;
+
         /** Initialises all fields. */
         KartInfo()  { reset(); }
         // --------------------------------------------------------------------
         /** Re-initialises all data. */
         void reset()
         {
-            m_race_lap          = -1;
+            m_finished_laps     = -1;
             m_lap_start_ticks   = 0;
             m_ticks_at_last_lap = INT_MAX;
             m_estimated_finish  = -1.0f;
             m_overall_distance  = 0.0f;
+            m_wrong_way_timer   = 0.0f;
         }   // reset
     };
     // ------------------------------------------------------------------------
@@ -101,7 +106,7 @@ protected:
       */
     AlignedArray<KartInfo> m_kart_info;
 
-    virtual void  checkForWrongDirection(unsigned int i, int ticks);
+    virtual void  checkForWrongDirection(unsigned int i, float dt);
     void          updateRacePosition();
     virtual float estimateFinishTimeForKart(AbstractKart* kart) OVERRIDE;
 
@@ -114,6 +119,7 @@ public:
     virtual      ~LinearWorld();
 
     virtual void  update(int ticks) OVERRIDE;
+    virtual void  updateGraphics(float dt) OVERRIDE;
     float         getDistanceDownTrackForKart(const int kart_id) const;
     float         getDistanceToCenterForKart(const int kart_id) const;
     float         getEstimatedFinishTime(const int kart_id) const;
@@ -141,10 +147,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of laps a kart has completed.
      *  \param kart_index World index of the kart. */
-    int getKartLaps(unsigned int kart_index) const OVERRIDE
+    int getFinishedLapsOfKart(unsigned int kart_index) const OVERRIDE
     {
         assert(kart_index < m_kart_info.size());
-        return m_kart_info[kart_index].m_race_lap;
+        return m_kart_info[kart_index].m_finished_laps;
     }   // getkartLap
     // ------------------------------------------------------------------------
     void setLastTriggeredCheckline(unsigned int kart_index, int index);

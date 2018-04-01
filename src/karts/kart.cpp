@@ -141,7 +141,6 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
     m_is_jumping           = false;
     m_min_nitro_ticks      = 0;
     m_fire_clicked         = 0;
-    m_wrongway_counter     = 0;
     m_type                 = RaceManager::KT_AI;
 
     m_view_blocked_by_plunger = 0;
@@ -1268,8 +1267,7 @@ void Kart::update(int ticks)
     // is used furthermore for engine power, camera distance etc
     updateSpeed();
 
-    if(!history->replayHistory() || !history->dontDoPhysics())
-        m_controller->update(ticks);
+    m_controller->update(ticks);
 
 #ifndef SERVER_ONLY
 #undef DEBUG_CAMERA_SHAKE
